@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Szczegóły Przepisu</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <style>
+        /* Styl bazowy */
+        body {
+            font-family: "Inter";
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Heading */
+        .recipe-name {
+            color: #02b8b3;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Instrukcje */
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Tabela */
+        .table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        thead th {
+            background-color: #02b8b3;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Przycisk */
+        .btn-primary {
+            background-color: #02b8b3;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: #006666;
+        }
+    </style>
+</head>
+<body>
+<div class="container recipe-details">
+    <h1 class="recipe-name" th:text="${recipe.name}">Nazwa Przepisu</h1>
+    <p th:text="${recipe.instructions}">Tutaj instrukcje</p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nazwa Składnika</th>
+            <th>Ilość</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ingredient : ${recipe.ingredients}">
+            <td th:text="${ingredient.product.name}">Nazwa Składnika</td>
+            <td th:text="${ingredient.quantity}">Ilość</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <form th:action="@{/makeDish/{recipeId}(recipeId=${recipe.id})}" method="post">
+        <button type="submit" class="btn btn-primary">Przyrządź Potrawę</button>
+    </form>
+    <div th:insert="fragments/footer :: footer"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

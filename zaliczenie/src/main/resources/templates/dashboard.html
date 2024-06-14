@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <style>
+        /* Styl bazowy */
+        body {
+            font-family: "Inter";
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Heading */
+        h1, h2, h3, h4 {
+            color: #02b8b3;
+            margin-bottom: 20px;
+        }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #02b8b3;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Form i wpisywanie */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #02b8b3;
+            outline: none;
+        }
+
+        /* Przyciski */
+        button, .btn {
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #02b8b3;
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #006666;
+        }
+
+        .btn-secondary {
+            background-color: #f8f8f8;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e6e6e6;
+        }
+
+        /* Linki */
+        a {
+            color: #02b8b3;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Witam, <span th:text="${user.username}">Użytkowniku</span>!</h1>
+
+    <h2>Moje produkty</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nazwa Produktu</th>
+            <th>Ilość</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="userProduct : ${userProducts}">
+            <td th:text="${userProduct.product.name}">Nazwa Produktu</td>
+            <td th:text="${userProduct.quantity}">0</td>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Dodaj produkt</h3>
+    <form th:action="@{/userproduct/add}" method="post">
+        <div class="form-group">
+            <label for="productName">Nazwa Produktu:</label>
+            <input type="text" class="form-control" id="productName" name="productName" required />
+        </div>
+        <div class="form-group">
+            <label for="quantity">Ilość:</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Dodaj Produkt</button>
+    </form>
+    <h4>Możliwe do przyrządzenia potrawy</h4>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nazwa Potrawy</th>
+            <th>Instrukcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="recipe : ${availableRecipes}">
+            <td>
+                <a th:href="@{/recipeDetails/{id}(id=${recipe.id})}" th:text="${recipe.name}">Nazwa Przepisu</a>
+            </td>
+            <td th:text="${recipe.instructions}">Instrukcje</td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/addRecipe" class="btn btn-primary">Dodaj Przepis</a>
+    <a href="/allRecipes" class="btn btn-secondary mt-3">Wyświetl Wszystkie Przepisy</a>
+    <div th:insert="fragments/footer :: footer"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

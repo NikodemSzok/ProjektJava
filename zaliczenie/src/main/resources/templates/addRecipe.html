@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dodawanie Przepisów</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
+    <style>
+        /* Styl bazowy */
+        body {
+            font-family: "Inter";
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Heading */
+        h1 {
+            color: #02b8b3;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Form i wpisywanie */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: #02b8b3;
+            outline: none;
+        }
+
+        /* Przyciski */
+        button, .btn {
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #02b8b3;
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #006666;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Sekcja składników */
+        .ingredient-row {
+            margin-bottom: 10px;
+        }
+
+        /* Dynamiczne pola składników */
+        .add-ingredient, .remove-ingredient {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Dodaj Przepis</h1>
+    <form th:action="@{/addRecipe}" th:object="${recipe}" method="post">
+        <div class="form-group">
+            <label for="recipeName">Nazwa Przepisu</label>
+            <input type="text" class="form-control" id="recipeName" name="name" placeholder="Wpisz nazwę przepisu" required>
+        </div>
+        <div class="form-group">
+            <label for="instructions">Instrukcje</label>
+            <textarea class="form-control" id="instructions" name="instructions" rows="3" required></textarea>
+        </div>
+        <div id="ingredient-section">
+            <label>Ingredients</label>
+            <div th:each="ingredient, ingStat : *{ingredients}" class="form-row align-items-end ingredient-row">
+                <div class="col">
+                    <input type="text" class="form-control" th:field="*{ingredients[__${ingStat.index}__].name}" placeholder="Nazwa składnika">
+                </div>
+                <div class="col">
+                    <input type="number" class="form-control" th:field="*{ingredients[__${ingStat.index}__].quantity}" placeholder="Ilość">
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-danger remove-ingredient" th:if="${ingStat.index > 0}">-</button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary add-ingredient">+</button>
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Dodaj Przepis</button>
+    </form>
+    <div th:insert="fragments/footer :: footer"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+
+    //JavaScript dla dynamicznych pól
+    document.addEventListener('DOMContentLoaded', function () {
+        const ingredientSection = document.getElementById('ingredient-section');
+        const addIngredientBtn = ingredientSection.querySelector('.add-ingredient');
+
+        addIngredientBtn.addEventListener('click', function () {
+            let newIndex = ingredientSection.querySelectorAll('.ingredient-row').length;
+            const newRow = document.createElement('div');
+            newRow.classList.add('form-row', 'align-items-end', 'ingredient-row');
+
+            newRow.innerHTML = `
+            <div class="col">
+                <input type="text" class="form-control" name="ingredients[${newIndex}].name" placeholder="Ingredient name">
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" name="ingredients[${newIndex}].quantity" placeholder="Quantity">
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-danger remove-ingredient">-</button>
+            </div>
+        `;
+
+            newRow.querySelector('.remove-ingredient').addEventListener('click', function () {
+                newRow.remove();
+                // Re-indexowanie pól po usunięciu
+                reIndexIngredientFields();
+            });
+
+            ingredientSection.insertBefore(newRow, addIngredientBtn);
+        });
+
+        function reIndexIngredientFields() {
+            const rows = ingredientSection.querySelectorAll('.ingredient-row');
+            rows.forEach((row, index) => {
+                row.querySelector('input[name*=".name"]').name = `ingredients[${index}].name`;
+                row.querySelector('input[name*=".quantity"]').name = `ingredients[${index}].quantity`;
+            });
+        }
+    });
+</script>
+</body>
+</html>
